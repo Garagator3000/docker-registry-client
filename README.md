@@ -7,7 +7,7 @@ API](http://docs.docker.com/registry/spec/api/), for Go applications.
 
 ```go
 import (
-    "github.com/heroku/docker-registry-client/registry"
+    "github.com/garagator3000/docker-registry-client/registry"
     "github.com/docker/distribution/digest"
     "github.com/docker/distribution/manifest"
     "github.com/docker/libtrust"
@@ -19,8 +19,9 @@ import (
 ```go
 url      := "https://registry-1.docker.io/"
 username := "" // anonymous
-password := "" // anonymous
-hub, err := registry.New(url, username, password)
+password := "" // anonymous 
+logger := logrus.New()
+hub, err := registry.New(url, username, password, logger)
 ```
 
 Creating a registry will also ping it to verify that it supports the registry
@@ -122,6 +123,19 @@ if err != nil {
 if !exists {
     stream := …
     hub.UploadBlob("example/repo", digest, stream)
+}
+```
+
+## Deleting layers
+```go
+digest, err := hub.ManifestDigest("example/repo", "latest")
+if err != nil {
+    // ...
+}
+
+err := hub.DeleteBlob("example/repo", digest)
+if err != nil {
+	// ...
 }
 ```
 

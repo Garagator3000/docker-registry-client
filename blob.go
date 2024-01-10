@@ -9,11 +9,29 @@ import (
 	"github.com/opencontainers/go-digest"
 )
 
-func (registry *Registry) DownloadBlob(repository string, digest digest.Digest) (io.ReadCloser, error) {
-	url := registry.url("/v2/%s/blobs/%s", repository, digest)
-	registry.Log.Debugf("registry.blob.download url=%s repository=%s digest=%s", url, repository, digest)
+func (registry *Registry) DeleteBlob(repository string, digest digest.Digest) error {
+	deleteUrl := registry.url("/v2/%s/blobs/%s", repository, digest)
+	registry.Log.Debugf("registry.blob.delete url=%s repository=%s digest=%s", deleteUrl, repository, digest)
 
-	resp, err := registry.Client.Get(url)
+	req, err := http.NewRequest(http.MethodDelete, deleteUrl, nil)
+	if err != nil {
+		return err
+	}
+	resp, err := registry.Client.Do(req)
+	if resp != nil {
+		defer resp.Body.Close()
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (registry *Registry) DownloadBlob(repository string, digest digest.Digest) (io.ReadCloser, error) {
+	downloadUrl := registry.url("/v2/%s/blobs/%s", repository, digest)
+	registry.Log.Debugf("registry.blob.download url=%s repository=%s digest=%s", downloadUrl, repository, digest)
+
+	resp, err := registry.Client.Get(downloadUrl)
 	if err != nil {
 		return nil, err
 	}
