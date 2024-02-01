@@ -1,6 +1,6 @@
 module github.com/garagator3000/docker-registry-client
 
-go 1.21.5
+go 1.21.3
 
 require (
 	github.com/docker/distribution v2.8.3+incompatible
